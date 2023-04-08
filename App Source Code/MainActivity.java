@@ -1,19 +1,28 @@
 //Change 'bluetoothcar' to your project's name
 package com.example.bluetoothcar;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -28,14 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
     boolean connected = false;
-    // Create objects
-    Button cnct = (Button) findViewById(R.id.connect);
-    Button front = (Button) findViewById(R.id.front);
-    Button back = (Button) findViewById(R.id.back);
-    Button left = (Button) findViewById(R.id.left);
-    Button right = (Button) findViewById(R.id.right);
-    TextView address = (TextView) findViewById(R.id.address);
-    TextView txt = (TextView) findViewById(R.id.text);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +44,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button cnct = (Button) findViewById(R.id.connect);
+        Button front = (Button) findViewById(R.id.front);
+        Button back = (Button) findViewById(R.id.back);
+        Button left = (Button) findViewById(R.id.left);
+        Button right = (Button) findViewById(R.id.right);
+        TextView address = (TextView) findViewById(R.id.address);
+        TextView txt = (TextView) findViewById(R.id.text);
+
         if (btAdapter == null) {
             System.out.println("Bluetooth not supported");
-        }
-        else {
+        } else {
             if (!btAdapter.isEnabled()) {
                 // Bluetooth is not enabled, request user permission to enable it.
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -55,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         cnct.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
 
@@ -93,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                                 txt.setText("Connection Failed!\n\nThe HC-05 BT Module Address may be incorrect. Enter the correct Address and tap on 'CONNECT' ");
                                 break;
                             }
-
+                            
                             i++;
 
                         } while(!btSocket.isConnected() && i < 10);
@@ -183,11 +190,24 @@ public class MainActivity extends AppCompatActivity {
         try {
             outStr = btSocket.getOutputStream();
             outStr.write(data);
-        }
+        } 
         catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                //txt.setText("Bluetooth is now enabled");
+            } else {
+                // User declined to enable Bluetooth, handle this case.
+            }
+        }
+    }
+
 
 }
