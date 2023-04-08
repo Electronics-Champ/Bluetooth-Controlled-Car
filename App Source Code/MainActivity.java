@@ -1,3 +1,4 @@
+//Change 'bluetoothcar' to your project's name
 package com.example.bluetoothcar;
 
 import androidx.appcompat.app.AppCompatActivity;
